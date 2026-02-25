@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Task Management Web App</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="container">
+    <h1>Task Management Dashboard</h1>
+
+    <form action="/add" method="POST" class="task-form">
+        <input type="text" name="title" placeholder="Task title..." required>
+
+        <select name="priority" required>
+            <option value="High">High Priority</option>
+            <option value="Medium">Medium Priority</option>
+            <option value="Low">Low Priority</option>
+        </select>
+
+        <input type="date" name="due_date" required>
+
+        <button type="submit">Add Task</button>
+    </form>
+
+    <div class="task-list">
+        {% for task in tasks %}
+        <div class="task-card {{ 'completed' if task.done else '' }}">
+            <div>
+                <h3>{{ task.title }}</h3>
+                <p>Priority: <span class="badge {{ task.priority }}">{{ task.priority }}</span></p>
+                <p>Due: {{ task.due_date.strftime('%d %b %Y') }}</p>
+            </div>
+
+            <div class="actions">
+                <a href="/toggle/{{ task.id }}">✔</a>
+                <a href="/delete/{{ task.id }}">🗑</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+</body>
+</html>
