@@ -18,13 +18,9 @@ Features
 - **Responsive** — Works on mobile and desktop
 
 Tech Stack
-
-| Layer | Technology |
-
-| Backend | Python, Flask |
-| Database | SQLite via SQLAlchemy ORM |
-| Frontend | HTML5, CSS3, Jinja2 Templating |
-| Deployment | Render (Gunicorn) |
+ Backend : Python, Flask 
+ Database : SQLite via SQLAlchemy ORM 
+ Frontend : HTML5, CSS3, Jinja2 Templating  
 
  Running Locally
 
@@ -66,4 +62,4 @@ taskflow/
 
  Author
 
-**[Faith Njeri]** 
+[Faith Njeri]
