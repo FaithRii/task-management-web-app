@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nova — Edit Task</title>
+    <link href="https://api.fontshare.com/v2/css?f[]=clash-display@400,500,600,700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="app-wrapper">
+
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <span class="logo-icon">✦</span>
+            <span class="logo-text">Nova</span>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="/" class="nav-item">
+                <span class="nav-icon">⊞</span> Dashboard
+            </a>
+        </nav>
+        <div class="sidebar-footer">
+            <p>Nova v2.0</p>
+            <p>Built with Flask + SQLite</p>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <header class="top-header">
+            <div>
+                <h1 class="page-title">Edit Task</h1>
+                <p class="page-subtitle"><a href="/" style="color: var(--accent); text-decoration: none;">← Back to Dashboard</a></p>
+            </div>
+        </header>
+
+        <section class="form-section" style="display:block;">
+            <h2 class="section-title">Update Task Details</h2>
+            <form action="/edit/{{ task.id }}" method="POST" class="task-form">
+                <div class="form-row">
+                    <input type="text" name="title" value="{{ task.title }}" placeholder="Task title..." required>
+                    <input type="text" name="description" value="{{ task.description or '' }}" placeholder="Short description (optional)">
+                </div>
+                <div class="form-row">
+                    <select name="priority" required>
+                        <option value="High" {{ 'selected' if task.priority == 'High' }}>🔴 High Priority</option>
+                        <option value="Medium" {{ 'selected' if task.priority == 'Medium' }}>🟠 Medium Priority</option>
+                        <option value="Low" {{ 'selected' if task.priority == 'Low' }}>🔵 Low Priority</option>
+                    </select>
+                    <input type="date" name="due_date" value="{{ task.due_date.strftime('%Y-%m-%d') }}" required>
+                    <button type="submit" class="btn-submit">Save Changes</button>
+                </div>
+            </form>
+        </section>
+    </main>
+</div>
+
+</body>
+</html>

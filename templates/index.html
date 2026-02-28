@@ -1,45 +1,162 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Task Management Web App</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nova — Dashboard</title>
+    <link href="https://api.fontshare.com/v2/css?f[]=clash-display@400,500,600,700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
 
-<div class="container">
-    <h1>Task Management Dashboard</h1>
+<div class="app-wrapper">
 
-    <form action="/add" method="POST" class="task-form">
-        <input type="text" name="title" placeholder="Task title..." required>
-
-        <select name="priority" required>
-            <option value="High">High Priority</option>
-            <option value="Medium">Medium Priority</option>
-            <option value="Low">Low Priority</option>
-        </select>
-
-        <input type="date" name="due_date" required>
-
-        <button type="submit">Add Task</button>
-    </form>
-
-    <div class="task-list">
-        {% for task in tasks %}
-        <div class="task-card {{ 'completed' if task.done else '' }}">
-            <div>
-                <h3>{{ task.title }}</h3>
-                <p>Priority: <span class="badge {{ task.priority }}">{{ task.priority }}</span></p>
-                <p>Due: {{ task.due_date.strftime('%d %b %Y') }}</p>
-            </div>
-
-            <div class="actions">
-                <a href="/toggle/{{ task.id }}">✔</a>
-                <a href="/delete/{{ task.id }}">🗑</a>
-            </div>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <span class="logo-icon">✦</span>
+            <span class="logo-text">Nova</span>
         </div>
-        {% endfor %}
-    </div>
+        <nav class="sidebar-nav">
+            <a href="/" class="nav-item active">
+                <span class="nav-icon">⊞</span> Dashboard
+            </a>
+        </nav>
+        <div class="sidebar-footer">
+            <p>Nova v2.0</p>
+            <p>Built with Flask + SQLite</p>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+
+        <!-- Header -->
+        <header class="top-header">
+            <div>
+                <h1 class="page-title">My Dashboard</h1>
+                <p class="page-subtitle">{{ today.strftime('%A, %d %B %Y') }}</p>
+            </div>
+            <button class="btn-add-toggle" onclick="toggleForm()">+ New Task</button>
+        </header>
+
+        <!-- Stats Cards -->
+        <section class="stats-grid">
+            <div class="stat-card stat-total">
+                <div class="stat-icon">📋</div>
+                <div class="stat-info">
+                    <span class="stat-number">{{ stats.total }}</span>
+                    <span class="stat-label">Total Tasks</span>
+                </div>
+            </div>
+            <div class="stat-card stat-completed">
+                <div class="stat-icon">✅</div>
+                <div class="stat-info">
+                    <span class="stat-number">{{ stats.completed }}</span>
+                    <span class="stat-label">Completed</span>
+                </div>
+            </div>
+            <div class="stat-card stat-remaining">
+                <div class="stat-icon">⏳</div>
+                <div class="stat-info">
+                    <span class="stat-number">{{ stats.remaining }}</span>
+                    <span class="stat-label">Remaining</span>
+                </div>
+            </div>
+            <div class="stat-card stat-overdue">
+                <div class="stat-icon">🚨</div>
+                <div class="stat-info">
+                    <span class="stat-number">{{ stats.overdue }}</span>
+                    <span class="stat-label">Overdue</span>
+                </div>
+            </div>
+            <div class="stat-card stat-today">
+                <div class="stat-icon">📅</div>
+                <div class="stat-info">
+                    <span class="stat-number">{{ stats.due_today }}</span>
+                    <span class="stat-label">Due Today</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Add Task Form (hidden by default) -->
+        <section class="form-section" id="taskForm" style="display:none;">
+            <h2 class="section-title">Add New Task</h2>
+            <form action="/add" method="POST" class="task-form">
+                <div class="form-row">
+                    <input type="text" name="title" placeholder="Task title..." required>
+                    <input type="text" name="description" placeholder="Short description (optional)">
+                </div>
+                <div class="form-row">
+                    <select name="priority" required>
+                        <option value="High">🔴 High Priority</option>
+                        <option value="Medium" selected>🟠 Medium Priority</option>
+                        <option value="Low">🔵 Low Priority</option>
+                    </select>
+                    <input type="date" name="due_date" required>
+                    <button type="submit" class="btn-submit">Add Task</button>
+                </div>
+            </form>
+        </section>
+
+        <!-- Task List -->
+        <section class="tasks-section">
+            <h2 class="section-title">All Tasks <span class="task-count">{{ stats.total }}</span></h2>
+
+            {% if tasks %}
+            <div class="task-list">
+                {% for task in tasks %}
+                {% set is_overdue = not task.done and task.due_date < today %}
+                {% set is_today = not task.done and task.due_date == today %}
+                <div class="task-card {{ 'completed' if task.done else '' }} {{ 'overdue' if is_overdue else '' }} {{ 'due-today' if is_today else '' }}">
+                    <div class="task-left">
+                        <a href="/toggle/{{ task.id }}" class="task-checkbox {{ 'checked' if task.done else '' }}">
+                            {{ '✓' if task.done else '' }}
+                        </a>
+                        <div class="task-info">
+                            <h3 class="task-title">{{ task.title }}</h3>
+                            {% if task.description %}
+                            <p class="task-desc">{{ task.description }}</p>
+                            {% endif %}
+                            <div class="task-meta">
+                                <span class="badge {{ task.priority }}">{{ task.priority }}</span>
+                                <span class="due-date {{ 'overdue-text' if is_overdue else '' }} {{ 'today-text' if is_today else '' }}">
+                                    {% if is_overdue %}🚨 Overdue · {% elif is_today %}📅 Due Today · {% endif %}
+                                    {{ task.due_date.strftime('%d %b %Y') }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="task-actions">
+                        <a href="/edit/{{ task.id }}" class="btn-edit" title="Edit">✏️</a>
+                        <a href="/delete/{{ task.id }}" class="btn-delete" title="Delete" onclick="return confirm('Delete this task?')">🗑</a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            {% else %}
+            <div class="empty-state">
+                <div class="empty-icon">🎉</div>
+                <h3>All clear!</h3>
+                <p>No tasks yet. Click <strong>+ New Task</strong> to get started.</p>
+            </div>
+            {% endif %}
+        </section>
+
+    </main>
 </div>
+
+<script>
+    function toggleForm() {
+        const form = document.getElementById('taskForm');
+        form.style.display = form.style.display === 'none' ? 'block' : 'none';
+        if (form.style.display === 'block') {
+            form.scrollIntoView({ behavior: 'smooth' });
+        }
+    }
+</script>
 
 </body>
 </html>
