@@ -3,12 +3,11 @@ from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime, date
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///tasks.db'
+import os
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///tasks.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
-with app.app_context():
-    db.create_all()
 
 class Task(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -17,6 +16,10 @@ class Task(db.Model):
     priority = db.Column(db.String(20), nullable=False)
     due_date = db.Column(db.Date, nullable=False)
     done = db.Column(db.Boolean, default=False)
+
+    
+with app.app_context():
+    db.create_all()
 
 @app.route('/')
 def index():
