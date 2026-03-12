@@ -7,6 +7,9 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///tasks.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
+with app.app_context():
+    db.create_all()
+
 class Task(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(200), nullable=False)
@@ -76,6 +79,7 @@ def edit_task(id):
         db.session.commit()
         return redirect(url_for('index'))
     return render_template('edit.html', task=task)
+
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()
