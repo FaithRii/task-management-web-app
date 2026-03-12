@@ -3,8 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime, date
 
 app = Flask(__name__)
-import os
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///tasks.db')
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///tasks.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
